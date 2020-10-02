@@ -47,11 +47,11 @@ class Controller {
         const scope = this;
         const requestOptions = {method: method, body: params};
         if (method === Controller.POST || method === Controller.PUT) {
-            requestOptions.headers = {"Content-type": "application/x-www-form-urlencoded"};
+            requestOptions.headers = { "Content-type": "application/x-www-form-urlencoded"};
         }
         fetch(endpoint, requestOptions)
             .then(response => {
-                if (response.status !== 200) {
+                if (response.status !== 200 && response.status !== 201) {
                     console.log("Request failed for " + endpoint + " HTTP status:" + response.status);
                     // Read the response
                     response.text().then(data => console.log("Response body: " + data));
@@ -69,7 +69,7 @@ class Controller {
      * Add an item and display it in the list.
      */
     addItem(title) {
-        this.sendAjax("addTodo", Controller.POST, "todo-title=" + title, function (data) {
+        this.sendAjax("todos/add", Controller.POST, "todo-title=" + title, function (data) {
             this.view.clearNewTodo();
             this._refresh(true);
             this._checkResponse(data, "addTodo");
@@ -124,7 +124,7 @@ class Controller {
      * Update an item in based on the state of completed.
      */
     toggleCompleted(id, completed) {
-        this.sendAjax("todos/" + id + "/toggle_status", Controller.PUT, "status=" + completed, function (data) {
+        this.sendAjax("todos/change/" + id + "/toggle_status", Controller.PUT, "status=" + completed, function (data) {
             this._refresh(true);
             this._checkResponse(data, "todos/" + id + "/toggle_status");
         });
@@ -148,7 +148,7 @@ class Controller {
 
         if (force || this._lastActiveState !== '' || this._lastActiveState !== state) {
             // an item looks like: {id:abc, title:"something", completed:true}
-            this.sendAjax("list", Controller.POST, "status=" + state, function (data) {
+            this.sendAjax("todos/list", Controller.POST, "status=" + state, function (data) {
                 const respObj = JSON.parse(data);
 
                 this.view.showItems(respObj);

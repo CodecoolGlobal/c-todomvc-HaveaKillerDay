@@ -23,6 +23,7 @@ namespace FirstAPI
             services.AddDbContext<TodoContext>(opt =>
                opt.UseInMemoryDatabase("TodoList"));
             services.AddControllers();
+            services.AddMvc();
 
         }
 
@@ -33,6 +34,8 @@ namespace FirstAPI
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseStaticFiles();
 
             app.UseRouting();
 

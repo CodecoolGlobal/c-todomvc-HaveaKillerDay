@@ -6,10 +6,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FirstAPI.Models;
+using System.Security.Permissions;
 
 namespace FirstAPI.Controllers
 {
-    [Route("api/TodoItems")]
+    [Route("todos")]
     [ApiController]
     public class TodoItemsController : ControllerBase
     {
@@ -20,7 +21,17 @@ namespace FirstAPI.Controllers
             _context = context;
         }
 
-        // GET: api/TodoItems
+        [HttpPost("list")]
+        public JsonResult GetListItems()
+        {
+            var body = _context.TodoItems.ToList();
+
+            JsonResult json = new JsonResult(body);
+
+            return json;
+        }
+
+        // GET: todos
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TodoItem>>> GetTodoItems()
         {
@@ -45,44 +56,87 @@ namespace FirstAPI.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTodoItem(long id, TodoItem todoItem)
+        [Consumes("application/x-www-form-urlencoded")]
+        public IActionResult PutTodoItem([FromForm] IFormCollection data)
         {
-            if (id != todoItem.Id)
+
+            List<string> requestBody = new List<string>();
+            //Something something = JsonConvert.DeserializeObject<Something>(data);
+            foreach (var key in data.Keys)
+            {
+                requestBody.Add(data[key]);
+            }
+
+            string newTitle = requestBody[0];
+            string idAsString = Request.Path.Value;
+            string[] splitted = idAsString.Split("/");
+            long ID = Convert.ToInt64(splitted[splitted.Length - 1]);
+
+            TodoItem searchedTodoItem = _context.TodoItems.Where(item => item.Id == ID).FirstOrDefault();
+
+            searchedTodoItem.Title = newTitle;
+
+            if (ID != searchedTodoItem.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(todoItem).State = EntityState.Modified;
+            _context.Entry(searchedTodoItem).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TodoItemExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+             _context.SaveChanges();
 
-            return NoContent();
+            return CreatedAtAction(nameof(GetTodoItem), new  { id = searchedTodoItem.Id}, searchedTodoItem);
+
         }
 
-        // POST: api/TodoItems
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItem todoItem)
+        [HttpPut("change/{id}/toggle_status")]
+        [Consumes("application/x-www-form-urlencoded")]
+        public IActionResult ToggleCompleted([FromForm] IFormCollection data)
         {
-            _context.TodoItems.Add(todoItem);
-            await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetTodoItem), new { id = todoItem.Id }, todoItem);
+            string idAsString = Request.Path.Value;
+            string[] splitted = idAsString.Split("/");
+            long ID = Convert.ToInt64(splitted[3]);
+
+            TodoItem searchedTodoItem = _context.TodoItems.Where(item => item.Id == ID).FirstOrDefault();
+
+            searchedTodoItem.Completed = !searchedTodoItem.Completed;
+
+            if (ID != searchedTodoItem.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(searchedTodoItem).State = EntityState.Modified;
+
+            _context.SaveChanges();
+
+            return CreatedAtAction(nameof(GetTodoItem), new { id = searchedTodoItem.Id }, searchedTodoItem);
+
+        }
+
+            // POST: api/TodoItems
+            // To protect from overposting attacks, enable the specific properties you want to bind to, for
+            // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+            [HttpPost("add")]
+        [Consumes("application/x-www-form-urlencoded")]
+        public ActionResult<TodoItem> PostTodoItem([FromForm] IFormCollection data)
+        {
+            TodoItem newItem;
+
+            List<string> requestBody = new List<string>();
+            //Something something = JsonConvert.DeserializeObject<Something>(data);
+            foreach (var key in data.Keys)
+            {
+                requestBody.Add(data[key]);
+            }
+
+            newItem = new TodoItem { Title = requestBody[0], Completed = false };
+
+            _context.TodoItems.Add(newItem);
+            _context.SaveChanges();
+
+            return CreatedAtAction(nameof(GetTodoItem), new { id = newItem.Id }, newItem);
         }
 
         // DELETE: api/TodoItems/5

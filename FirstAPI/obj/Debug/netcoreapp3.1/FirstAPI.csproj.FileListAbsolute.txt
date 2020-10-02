@@ -155,3 +155,12 @@ E:\VS Projects\SI_6Week\c-todomvc-HaveaKillerDay\FirstAPI\obj\Debug\netcoreapp3.
 E:\VS Projects\SI_6Week\c-todomvc-HaveaKillerDay\FirstAPI\obj\Debug\netcoreapp3.1\FirstAPI.MvcApplicationPartsAssemblyInfo.cache
 E:\VS Projects\SI_6Week\c-todomvc-HaveaKillerDay\FirstAPI\bin\Debug\netcoreapp3.1\FirstAPI.Views.dll
 E:\VS Projects\SI_6Week\c-todomvc-HaveaKillerDay\FirstAPI\bin\Debug\netcoreapp3.1\FirstAPI.Views.pdb
+E:\VS Projects\SI_6Week\c-todomvc-HaveaKillerDay\FirstAPI\obj\Debug\netcoreapp3.1\FirstAPI.RazorAssemblyInfo.cache
+E:\VS Projects\SI_6Week\c-todomvc-HaveaKillerDay\FirstAPI\obj\Debug\netcoreapp3.1\FirstAPI.RazorAssemblyInfo.cs
+E:\VS Projects\SI_6Week\c-todomvc-HaveaKillerDay\FirstAPI\obj\Debug\netcoreapp3.1\FirstAPI.TagHelpers.input.cache
+E:\VS Projects\SI_6Week\c-todomvc-HaveaKillerDay\FirstAPI\obj\Debug\netcoreapp3.1\FirstAPI.TagHelpers.output.cache
+E:\VS Projects\SI_6Week\c-todomvc-HaveaKillerDay\FirstAPI\obj\Debug\netcoreapp3.1\FirstAPI.RazorCoreGenerate.cache
+E:\VS Projects\SI_6Week\c-todomvc-HaveaKillerDay\FirstAPI\obj\Debug\netcoreapp3.1\Razor\Views\Home\Home.cshtml.g.cs
+E:\VS Projects\SI_6Week\c-todomvc-HaveaKillerDay\FirstAPI\obj\Debug\netcoreapp3.1\FirstAPI.RazorTargetAssemblyInfo.cs
+E:\VS Projects\SI_6Week\c-todomvc-HaveaKillerDay\FirstAPI\obj\Debug\netcoreapp3.1\FirstAPI.Views.pdb
+E:\VS Projects\SI_6Week\c-todomvc-HaveaKillerDay\FirstAPI\obj\Debug\netcoreapp3.1\Razor\Views\Shared\Layout.cshtml.g.cs

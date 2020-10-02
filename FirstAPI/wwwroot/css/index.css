@@ -116,7 +116,7 @@ label[for='new-todo'] {
 .todo-list {
 	margin: 0;
 	padding: 0;
-	list-style: none;
+	/*list-style: none;*/
 }
 
 .todo-list li {
