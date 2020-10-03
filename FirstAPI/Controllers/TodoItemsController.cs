@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FirstAPI.Models;
 using System.Security.Permissions;
+using System.Security.Cryptography.X509Certificates;
 
 namespace FirstAPI.Controllers
 {
@@ -22,9 +23,23 @@ namespace FirstAPI.Controllers
         }
 
         [HttpPost("list")]
-        public JsonResult GetListItems()
+        [Consumes("application/x-www-form-urlencoded")]
+        public JsonResult GetListItems([FromForm] IFormCollection data)
         {
-            var body = _context.TodoItems.ToList();
+            List<TodoItem> body;
+
+            if (data["status"].Equals("active"))
+            {
+                body = _context.TodoItems.Where(item => item.Completed == false).ToList();
+            } 
+            else if (data["status"].Equals("complete"))
+            {
+                body = _context.TodoItems.Where(item => item.Completed == true).ToList();
+            }
+            else
+            {
+                body = _context.TodoItems.ToList();
+            }
 
             JsonResult json = new JsonResult(body);
 
@@ -61,7 +76,7 @@ namespace FirstAPI.Controllers
         {
 
             List<string> requestBody = new List<string>();
-            //Something something = JsonConvert.DeserializeObject<Something>(data);
+
             foreach (var key in data.Keys)
             {
                 requestBody.Add(data[key]);
@@ -115,17 +130,44 @@ namespace FirstAPI.Controllers
 
         }
 
-            // POST: api/TodoItems
-            // To protect from overposting attacks, enable the specific properties you want to bind to, for
-            // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-            [HttpPost("add")]
+        [HttpPut("toggle_all")]
+        [Consumes("application/x-www-form-urlencoded")]
+        public IActionResult ToggleAllCompleted([FromForm] IFormCollection data)
+        {
+            string requestBody = "";
+            bool toggle_value;
+            foreach (var key in data.Keys)
+            {
+               requestBody = data[key];
+            }
+
+            toggle_value = requestBody.Equals("true") ? true : false;
+
+            if (_context.TodoItems.Count() == 0)
+            {
+                return BadRequest();
+            }
+
+            foreach (TodoItem item in _context.TodoItems)
+            {
+                item.Completed = toggle_value;
+            }
+
+            _context.SaveChanges();
+
+            return CreatedAtAction(nameof(GetTodoItem), new { id = 1 }, _context.TodoItems);
+        }
+
+        // POST: api/TodoItems
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [HttpPost("add")]
         [Consumes("application/x-www-form-urlencoded")]
         public ActionResult<TodoItem> PostTodoItem([FromForm] IFormCollection data)
         {
             TodoItem newItem;
 
             List<string> requestBody = new List<string>();
-            //Something something = JsonConvert.DeserializeObject<Something>(data);
             foreach (var key in data.Keys)
             {
                 requestBody.Add(data[key]);
@@ -139,7 +181,24 @@ namespace FirstAPI.Controllers
             return CreatedAtAction(nameof(GetTodoItem), new { id = newItem.Id }, newItem);
         }
 
-        // DELETE: api/TodoItems/5
+
+        [HttpDelete("completed")]
+        public IActionResult DeleteCompletedItems()
+        {
+            foreach (TodoItem item in _context.TodoItems)
+            {
+                if (item.Completed)
+                {
+                    _context.TodoItems.Remove(item);
+                }
+            }
+
+            _context.SaveChanges();
+
+            return Ok(true);
+        }
+
+        // DELETE: todos/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<TodoItem>> DeleteTodoItem(long id)
         {
